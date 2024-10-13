@@ -7,9 +7,11 @@ namespace CSVFileDataManagement
     internal class CSVManager
     {
         private static string activePath = string.Empty;
+        public static string activeFileName = string.Empty;
         private static string activeFilePath = string.Empty;
         private static string[] activeFileContents = Array.Empty<string>();
-        
+        public static int activeIndex = 0;
+
         private static char splitChar = ';';
         private static char fillChar = '-';
         private static char spaceChar = '|';
@@ -24,6 +26,7 @@ namespace CSVFileDataManagement
 
         public static void SetActiveFile(string fileName)
         {
+            activeFileName = fileName;
             activeFilePath = $"{activePath}/{fileName}";
 
             if (File.Exists(activeFilePath))
@@ -72,7 +75,7 @@ namespace CSVFileDataManagement
         {
             Vector2 consoleSize = new Vector2(Console.WindowWidth, Console.WindowHeight);
             string consoleFillerString = new string(fillChar, (int)consoleSize.X);
-            int calculatedWidthRequired = GetArrayMaxLength(activeFileContents) + 12;
+            int calculatedWidthRequired = GetArrayMaxLength(activeFileContents) + 12; // will probably not work in higher fontsizes
 
             if (calculatedWidthRequired > Console.WindowWidth)
             {
@@ -80,25 +83,32 @@ namespace CSVFileDataManagement
                 return;
             }
 
-            foreach (string str in activeFileContents) {
+            for (int x = 0; x < activeFileContents.Length; x++) { 
+                string str = activeFileContents[x];
+
                 string[] splitEntries = str.Split(splitChar);
                 int linePosition = Console.GetCursorPosition().Top + 1;
                 int activeColumnPosition = 0;
+
+                ConsoleColor activeColor = ConsoleManagement.Colors.foregroundColor;
+                if (activeIndex == x && x != 0) // 0 = template
+                    activeColor = ConsoleManagement.Colors.selectedColor;
+                Console.ForegroundColor = activeColor;
 
                 for (int i = 0; i < splitEntries.Length; i++)
                 {
                     int columnWidth = GetColumnLength(activeFileContents, i);
 
-                    Console.SetCursorPosition(activeColumnPosition, linePosition);
                     Console.Write(splitEntries[i]);
                     activeColumnPosition += columnWidth + columnSpacing;
-                    Console.SetCursorPosition(activeColumnPosition, linePosition);
+                    Console.SetCursorPosition(activeColumnPosition, Console.GetCursorPosition().Top);
                     activeColumnPosition += columnSpacing;
                     Console.Write(spaceChar);
                 }
+                Console.Write(Environment.NewLine);
             }
 
-            Console.SetCursorPosition(0, Console.GetCursorPosition().Top + 1);
+            Console.ForegroundColor = ConsoleManagement.Colors.foregroundColor;
         }
     }
 }
