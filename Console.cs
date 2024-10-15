@@ -1,3 +1,4 @@
+using Microsoft.Win32.SafeHandles;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
@@ -10,6 +11,27 @@ namespace CSVFileDataManagement
         {
             public static ConsoleColor foregroundColor = ConsoleColor.White;
             public static ConsoleColor selectedColor = ConsoleColor.Cyan;
+        }
+
+        internal class Functions
+        {
+            public static void WriteCharPosition(ref char[] buffer, int position, string write)
+            {
+                char[] modifiedBuffer = new char[Math.Max(buffer.Length, position) + write.Length];
+
+                for (int i = 0; i < buffer.Length; i++)
+                    modifiedBuffer[i] = buffer[i];
+
+                if (position > buffer.Length)
+                    for (int i = buffer.Length; i < position; i++)
+                        modifiedBuffer[i] = ' ';
+
+                char[] stringToCharArray = write.ToCharArray();
+                for (int i = 0; i < stringToCharArray.Length; i++)
+                    modifiedBuffer[position + i] = stringToCharArray[i];
+
+                buffer = modifiedBuffer;
+            }
         }
     }
 }
