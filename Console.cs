@@ -35,3 +35,20 @@ namespace CSVFileDataManagement
         }
     }
 }
+
+
+/*  
+                for (int i = 0; i < splitEntries.Length; i++)
+                {
+                    int columnWidth = GetColumnLength(activeFileContents, i);
+                    ConsoleManagement.Functions.WriteCharPosition(ref textBuffer, textBuffer.Length, splitEntries[i]);
+                    activeColumnPosition += columnWidth + columnSpacing;
+                    ConsoleManagement.Functions.WriteCharPosition(ref textBuffer, activeColumnPosition, spaceChar.ToString());
+                    activeColumnPosition += columnSpacing;
+                }
+
+                ConsoleManagement.Functions.WriteCharPosition(ref textBuffer, textBuffer.Length, "\n");
+            }
+
+            Console.WriteLine(textBuffer);
+ */

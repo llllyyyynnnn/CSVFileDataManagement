@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Data;
+using System.IO;
 using System.Numerics;
 using System.Reflection;
 
@@ -6,10 +8,9 @@ namespace CSVFileDataManagement
 {
     internal class CSVManager
     {
-        private static string activePath = string.Empty;
         public static string activeFileName = string.Empty;
         private static string activeFilePath = string.Empty;
-        private static string activeFileTemplate = string.Empty;
+        private static Dictionary<string, int> activeFileTemplate = new Dictionary<string, int>();
         private static string[] activeFileContents = Array.Empty<string>();
         private static int activeIndex = 0;
 
@@ -18,16 +19,43 @@ namespace CSVFileDataManagement
         private static char spaceChar = '|';
 
         private static int columnSpacing = 2;
-
-        public static void Initialize()
-        {
-            activePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            Console.WriteLine($"Active path has been set to {activePath}");
-        }
         
+        public static void ClearVariables()
+        {
+            activeFileTemplate.Clear();
+            activeFileContents = Array.Empty<string>();
+            activeIndex = 0;
+        }
+
+        public static void WriteActiveContentsToFile()
+        {
+            string writeContent = string.Empty;
+
+            for(int x = 0; x < activeFileContents.Length; x++)
+            {
+                string[] splitLine = activeFileContents[x].Split(splitChar);
+                string combinedLine = string.Empty;
+
+                for(int y = 1; y < splitLine.Length; y++)
+                {
+                    string addLine = splitLine[y];
+                    if (y < splitLine.Length - 1)
+                        addLine += splitChar;
+                    combinedLine += addLine;
+                }
+
+                writeContent += combinedLine;
+
+                if (x < activeFileContents.Length - 1)
+                    writeContent += Environment.NewLine;
+            }
+
+            File.WriteAllText(activeFilePath, writeContent);
+        }
+
         public static void CreateCSVFile(string fileName)
         {
-            
+            File.Create(activeFileName);
         }
 
         public static void SetActiveFile(string fileName)
@@ -47,10 +75,7 @@ namespace CSVFileDataManagement
                 if (userInput == "yes")
                     CreateCSVFile(fileName);
                 else
-                {
                     activeFileName = string.Empty;
-                    activeFilePath = string.Empty;
-                }
             }
         }
 
@@ -58,26 +83,26 @@ namespace CSVFileDataManagement
         {
             if (activeFileName == string.Empty || activeFilePath == string.Empty)
                 return;
+            ClearVariables();
 
             string fileData = File.ReadAllText(activeFilePath);
-
-            /*
-                         if(activeFileContents != null || activeFileContents.Length > 0)
-                            activeFileContents = Array.Empty<string>();
-             */
-
             activeFileContents = fileData.Split(Environment.NewLine);
             activeFileContents[0] = $"Index{splitChar}{activeFileContents[0]}"; // assign index field
-            activeFileTemplate = activeFileContents[0];
 
             for (int i = 1; i < activeFileContents.Length; i++)
-                activeFileContents[i] = $"{i}{splitChar}{activeFileContents[i]}"; // assign index
+            {
+                if (activeFileContents[i].Length > 0)
+                    activeFileContents[i] = $"{i}{splitChar}{activeFileContents[i]}"; // assign index
+            }
+            string[] splitFileTemplate = activeFileContents[0].Split(splitChar);
+            for(int i = 1; i < splitFileTemplate.Length; i++)
+                activeFileTemplate.Add(splitFileTemplate[i].ToLower(), i);
         }
 
         public static void SetActiveIndex(int index)
         {
-            if (index > activeFileContents.Length - 1)
-                Console.WriteLine("Exceeded largest index number.");
+            if (index > activeFileContents.Length - 1 || index == 0)
+                Console.WriteLine("Requested index exceeded allowed range.");
             else
                 activeIndex = index;
         }
@@ -101,7 +126,7 @@ namespace CSVFileDataManagement
             {
                 string[] splitEntries = str.Split(splitChar);
 
-                if(splitEntries.Length - 1 > index)
+                if(splitEntries.Length > index)
                     if (splitEntries[index].Length > largestStringLength)
                         largestStringLength = splitEntries[index].Length;
             }
@@ -109,9 +134,56 @@ namespace CSVFileDataManagement
             return largestStringLength;
         }
 
-        public static void AddData()
+        public static void SortListByColumn(string fieldName)
         {
 
+        }
+
+        public static void AddRow()
+        {
+            string writeString = string.Empty;
+
+            foreach (KeyValuePair<string, int> entry in activeFileTemplate)
+            {
+                string key = entry.Key;
+                int index = entry.Value;
+
+                Console.WriteLine($"Current row: {key}. Waiting for input.");
+                writeString += Console.ReadLine();
+                if (index != activeFileTemplate.Count)
+                    writeString += splitChar;
+            }
+
+            StreamWriter writer = new StreamWriter(activeFilePath, append: true);
+            writer.Write($"{Environment.NewLine}{writeString}");
+            writer.Close();
+
+            ReadActiveFile();
+        }
+
+        public static void ModifyRowData(string fieldName, string newValue)
+        {
+            foreach (KeyValuePair<string, int> entry in activeFileTemplate)
+            {
+                string key = entry.Key;
+                int index = entry.Value;
+
+                Console.WriteLine($"{key}, {index}");
+            }
+
+            string lineString = activeFileContents[activeIndex];
+            string[] lineStringSplit = lineString.Split(splitChar);
+            lineStringSplit[activeFileTemplate[fieldName]] = newValue;
+            string lineStringModified = string.Empty;
+            for (int i = 0; i < lineStringSplit.Length; i++)
+            {
+                lineStringModified += lineStringSplit[i];
+                if(i < lineStringSplit.Length - 1)
+                    lineStringModified += splitChar;
+            }
+
+            activeFileContents[activeIndex] = lineStringModified;
+            WriteActiveContentsToFile();
         }
 
         public static void PrintData()
@@ -144,36 +216,20 @@ namespace CSVFileDataManagement
                     activeColor = ConsoleManagement.Colors.selectedColor;
                 Console.ForegroundColor = activeColor;
 
-                for (int i = 0; i < splitEntries.Length; i++)
+                for (int y = 0; y < splitEntries.Length; y++)
                 {
-                    int columnWidth = GetColumnLength(activeFileContents, i);
+                    int columnWidth = GetColumnLength(activeFileContents, y);
 
-                    Console.Write(splitEntries[i]);
+                    Console.Write(splitEntries[y]);
                     activeColumnPosition += columnWidth + columnSpacing;
                     Console.SetCursorPosition(activeColumnPosition, Console.GetCursorPosition().Top);
                     activeColumnPosition += columnSpacing;
                     Console.Write(spaceChar);
                 }
-                Console.Write(Environment.NewLine);
 
+                Console.Write(Environment.NewLine);
                 Console.ForegroundColor = ConsoleManagement.Colors.foregroundColor;
             }
         }
     }
 }
-
-/*  
-                for (int i = 0; i < splitEntries.Length; i++)
-                {
-                    int columnWidth = GetColumnLength(activeFileContents, i);
-                    ConsoleManagement.Functions.WriteCharPosition(ref textBuffer, textBuffer.Length, splitEntries[i]);
-                    activeColumnPosition += columnWidth + columnSpacing;
-                    ConsoleManagement.Functions.WriteCharPosition(ref textBuffer, activeColumnPosition, spaceChar.ToString());
-                    activeColumnPosition += columnSpacing;
-                }
-
-                ConsoleManagement.Functions.WriteCharPosition(ref textBuffer, textBuffer.Length, "\n");
-            }
-
-            Console.WriteLine(textBuffer);
- */
