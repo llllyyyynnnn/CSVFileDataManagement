@@ -53,8 +53,6 @@ void WaitForCommand()
                 Console.WriteLine("modify row fieldName newValue");
                 break;
         }
-
-        CSVManager.WriteActiveContentsToFile();
     }
     catch (Exception ex) {
         Console.WriteLine(ex.Message);

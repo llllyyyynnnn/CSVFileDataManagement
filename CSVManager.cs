@@ -29,6 +29,9 @@ namespace CSVFileDataManagement
 
         public static void WriteActiveContentsToFile()
         {
+            if (activeFileName == string.Empty || activeFilePath == string.Empty)
+                return;
+
             string writeContent = string.Empty;
 
             for(int x = 0; x < activeFileContents.Length; x++)
@@ -162,6 +165,8 @@ namespace CSVFileDataManagement
 
                 currentIndex++;
             }
+
+            WriteActiveContentsToFile();
         }
 
         public static void AddRow()
@@ -208,6 +213,7 @@ namespace CSVFileDataManagement
             }
 
             activeFileContents[activeIndex] = lineStringModified;
+            WriteActiveContentsToFile();
         }
 
         public static void PrintData()
