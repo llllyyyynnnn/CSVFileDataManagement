@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 
@@ -249,11 +251,11 @@ namespace CSVFileDataManagement
                 for (int y = 0; y < splitEntries.Length; y++)
                 {
                     int columnWidth = GetColumnLength(activeFileContents, y);
-
                     Console.Write(splitEntries[y]);
                     activeColumnPosition += columnWidth + columnSpacing;
                     Console.SetCursorPosition(activeColumnPosition, Console.GetCursorPosition().Top);
                     activeColumnPosition += columnSpacing;
+                    Console.ForegroundColor = activeColor;
                     Console.Write(spaceChar);
                 }
 
@@ -263,3 +265,16 @@ namespace CSVFileDataManagement
         }
     }
 }
+
+/*
+                    if (y == activeFileTemplate["födelsedag"])
+                    {
+                        if (ConsoleManagement.Functions.UpcomingDate(splitEntries[y], 10))
+                        {
+                            Console.ForegroundColor = ConsoleManagement.Colors.upcomingColor;
+
+                            if (ConsoleManagement.Functions.IsDateToday(splitEntries[y]))
+                                Console.ForegroundColor = ConsoleManagement.Colors.urgentColor;
+                        }
+                    }
+ */
