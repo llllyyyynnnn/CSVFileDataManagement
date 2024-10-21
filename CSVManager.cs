@@ -134,9 +134,34 @@ namespace CSVFileDataManagement
             return largestStringLength;
         }
 
-        public static void SortListByColumn(string fieldName)
+        public static void SortColumnByRow(string rowName)
         {
+            int fieldIndex = activeFileTemplate[rowName];
+            Dictionary<int, string> rowList = new Dictionary<int, string>();
 
+            for(int i = 1; i < activeFileContents.Length; i++)
+            {
+                string str = activeFileContents[i];
+                string[] splitLine = str.Split(splitChar);
+                string activeString = splitLine[activeFileTemplate[rowName]];
+
+                rowList.Add(i, activeString);
+            }
+
+            int currentIndex = 1;
+            foreach (var entry in rowList.OrderBy(kv => kv.Value))
+            {
+                int rowIndex = entry.Key;
+                string sortedValue = entry.Value;
+                string str = activeFileContents[rowIndex];
+                string[] splitLine = str.Split(splitChar);
+
+                splitLine[fieldIndex] = sortedValue;
+                splitLine[0] = currentIndex.ToString();
+                activeFileContents[currentIndex] = string.Join(splitChar.ToString(), splitLine);
+
+                currentIndex++;
+            }
         }
 
         public static void AddRow()
@@ -161,7 +186,7 @@ namespace CSVFileDataManagement
             ReadActiveFile();
         }
 
-        public static void ModifyRowData(string fieldName, string newValue)
+        public static void ModifyRowData(string rowName, string newValue)
         {
             foreach (KeyValuePair<string, int> entry in activeFileTemplate)
             {
@@ -173,7 +198,7 @@ namespace CSVFileDataManagement
 
             string lineString = activeFileContents[activeIndex];
             string[] lineStringSplit = lineString.Split(splitChar);
-            lineStringSplit[activeFileTemplate[fieldName]] = newValue;
+            lineStringSplit[activeFileTemplate[rowName]] = newValue;
             string lineStringModified = string.Empty;
             for (int i = 0; i < lineStringSplit.Length; i++)
             {
@@ -183,7 +208,6 @@ namespace CSVFileDataManagement
             }
 
             activeFileContents[activeIndex] = lineStringModified;
-            WriteActiveContentsToFile();
         }
 
         public static void PrintData()

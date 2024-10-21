@@ -42,6 +42,10 @@ void WaitForCommand()
                         break;
                 }
                 break;
+            case "sort":
+                if (splitInputToLower[1] == "alphabetical")
+                    CSVManager.SortColumnByRow(splitInputToLower[2]);
+                break;
             case "help":
                 Console.WriteLine("set index *");
                 Console.WriteLine("set file path.csv");
@@ -49,6 +53,8 @@ void WaitForCommand()
                 Console.WriteLine("modify row fieldName newValue");
                 break;
         }
+
+        CSVManager.WriteActiveContentsToFile();
     }
     catch (Exception ex) {
         Console.WriteLine(ex.Message);
