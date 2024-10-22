@@ -1,10 +1,5 @@
-﻿using System;
-using System.Data;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System.Data;
 using System.Numerics;
-using System.Reflection;
 
 namespace CSVFileDataManagement
 {
@@ -243,9 +238,9 @@ namespace CSVFileDataManagement
                 int linePosition = Console.GetCursorPosition().Top + 1;
                 int activeColumnPosition = 0;
 
-                ConsoleColor activeColor = ConsoleManagement.Colors.foregroundColor;
+                ConsoleColor activeColor = CSVApplication.Colors.foregroundColor;
                 if (activeIndex == x && x != 0) // 0 = template
-                    activeColor = ConsoleManagement.Colors.selectedColor;
+                    activeColor = CSVApplication.Colors.selectedColor;
                 Console.ForegroundColor = activeColor;
 
                 for (int y = 0; y < splitEntries.Length; y++)
@@ -260,7 +255,7 @@ namespace CSVFileDataManagement
                 }
 
                 Console.Write(Environment.NewLine);
-                Console.ForegroundColor = ConsoleManagement.Colors.foregroundColor;
+                Console.ForegroundColor = CSVApplication.Colors.foregroundColor;
             }
         }
     }
@@ -269,12 +264,12 @@ namespace CSVFileDataManagement
 /*
                     if (y == activeFileTemplate["födelsedag"])
                     {
-                        if (ConsoleManagement.Functions.UpcomingDate(splitEntries[y], 10))
+                        if (CSVApplication.Functions.UpcomingDate(splitEntries[y], 10))
                         {
-                            Console.ForegroundColor = ConsoleManagement.Colors.upcomingColor;
+                            Console.ForegroundColor = CSVApplication.Colors.upcomingColor;
 
-                            if (ConsoleManagement.Functions.IsDateToday(splitEntries[y]))
-                                Console.ForegroundColor = ConsoleManagement.Colors.urgentColor;
+                            if (CSVApplication.Functions.IsDateToday(splitEntries[y]))
+                                Console.ForegroundColor = CSVApplication.Colors.urgentColor;
                         }
                     }
  */

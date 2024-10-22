@@ -62,7 +62,7 @@ void WaitForCommand()
 
 while (true)
 {
-    Console.ForegroundColor = ConsoleManagement.Colors.foregroundColor;
+    Console.ForegroundColor = CSVApplication.Colors.foregroundColor;
     Console.Clear();
 
     if (CSVManager.activeFileName == string.Empty)
