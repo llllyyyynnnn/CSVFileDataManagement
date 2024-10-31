@@ -1,6 +1,4 @@
-﻿using CSVFileDataManagement;
-
-CSVManager manager = new CSVManager();
+﻿CSVManager manager = new CSVManager();
 
 void WaitForCommand()
 {
@@ -20,10 +18,6 @@ void WaitForCommand()
                     case "index":
                         manager.SetActiveIndex(int.Parse(splitInput[2]));
                         break;
-
-                    case "file":
-                        manager.SetActiveFile(splitInput[2]);
-                        break;
                 }
                 break;
             case "add":
@@ -34,19 +28,28 @@ void WaitForCommand()
                         break;
                 }
                 break;
-
+            case "delete":
+                if (splitInputToLower[1] == "column")
+                    manager.DeleteColumn();
+                break;
             case "modify":
                 switch (splitInputToLower[1])
                 {
                     case "row":
-                        int commandLength = splitInputToLower[0].Length + splitInputToLower[1].Length + splitInputToLower[2].Length + 3;
-                        manager.ModifyRowData(splitInputToLower[2], input.Substring(commandLength, input.Length - commandLength));
+                        manager.ModifyRowData(splitInputToLower[2]);
                         break;
                 }
                 break;
             case "sort":
                 if (splitInputToLower[1] == "alphabetical")
                     manager.SortColumnByRow(splitInputToLower[2]);
+                break;
+
+            case "save":
+                manager.WriteActiveContentsToFile();
+                break;
+            case "write":
+                manager.WriteActiveContentsToFile();
                 break;
             case "help":
                 Console.WriteLine("set index *");
