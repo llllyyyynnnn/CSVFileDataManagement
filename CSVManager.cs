@@ -5,108 +5,16 @@ namespace CSVFileDataManagement
 {
     internal class CSVManager
     {
-        public static string activeFileName = string.Empty;
-        private static string activeFilePath = string.Empty;
-        private static Dictionary<string, int> activeFileTemplate = new Dictionary<string, int>();
-        private static string[] activeFileContents = Array.Empty<string>();
-        private static int activeIndex = 0;
+        public string activeFileName = string.Empty;
+        private Dictionary<string, int> activeFileTemplate = new Dictionary<string, int>();
+        private string[] activeFileContents = Array.Empty<string>();
+        private int activeIndex = 0;
 
         private static char splitChar = ';';
         private static char fillChar = '-';
         private static char spaceChar = '|';
 
         private static int columnSpacing = 2;
-        
-        public static void ClearVariables()
-        {
-            activeFileTemplate.Clear();
-            activeFileContents = Array.Empty<string>();
-            activeIndex = 0;
-        }
-
-        public static void WriteActiveContentsToFile()
-        {
-            if (activeFileName == string.Empty || activeFilePath == string.Empty)
-                return;
-
-            string writeContent = string.Empty;
-
-            for(int x = 0; x < activeFileContents.Length; x++)
-            {
-                string[] splitLine = activeFileContents[x].Split(splitChar);
-                string combinedLine = string.Empty;
-
-                for(int y = 1; y < splitLine.Length; y++)
-                {
-                    string addLine = splitLine[y];
-                    if (y < splitLine.Length - 1)
-                        addLine += splitChar;
-                    combinedLine += addLine;
-                }
-
-                writeContent += combinedLine;
-
-                if (x < activeFileContents.Length - 1)
-                    writeContent += Environment.NewLine;
-            }
-
-            File.WriteAllText(activeFilePath, writeContent);
-        }
-
-        public static void CreateCSVFile(string fileName)
-        {
-            File.Create(activeFileName);
-        }
-
-        public static void SetActiveFile(string fileName)
-        {
-            activeFileName = fileName;
-
-            if (File.Exists(activeFileName))
-            {
-                activeFilePath = Path.GetFullPath(activeFileName);
-                Console.WriteLine($"{fileName} was found");
-            }
-            else
-            {
-                Console.WriteLine($"{fileName} was not found, would you like to create it? ('yes' to continue)");
-                string userInput = Console.ReadLine();
-
-                if (userInput == "yes")
-                    CreateCSVFile(fileName);
-                else
-                    activeFileName = string.Empty;
-            }
-        }
-
-        public static void ReadActiveFile()
-        {
-            if (activeFileName == string.Empty || activeFilePath == string.Empty)
-                return;
-            ClearVariables();
-
-            string fileData = File.ReadAllText(activeFilePath);
-            activeFileContents = fileData.Split(Environment.NewLine);
-            activeFileContents[0] = $"Index{splitChar}{activeFileContents[0]}"; // assign index field
-
-            for (int i = 1; i < activeFileContents.Length; i++)
-            {
-                if (activeFileContents[i].Length > 0)
-                    activeFileContents[i] = $"{i}{splitChar}{activeFileContents[i]}"; // assign index
-            }
-            string[] splitFileTemplate = activeFileContents[0].Split(splitChar);
-            for(int i = 1; i < splitFileTemplate.Length; i++)
-                activeFileTemplate.Add(splitFileTemplate[i].ToLower(), i);
-        }
-
-        public static void SetActiveIndex(int index)
-        {
-            if (index > activeFileContents.Length - 1 || index == 0)
-                Console.WriteLine("Requested index exceeded allowed range.");
-            else
-                activeIndex = index;
-        }
-
         private static int GetArrayMaxLength(string[] array)
         {
             int largestStringLength = 0;
@@ -122,11 +30,11 @@ namespace CSVFileDataManagement
         {
             int largestStringLength = 0;
 
-            foreach(string str in array)
+            foreach (string str in array)
             {
                 string[] splitEntries = str.Split(splitChar);
 
-                if(splitEntries.Length > index)
+                if (splitEntries.Length > index)
                     if (splitEntries[index].Length > largestStringLength)
                         largestStringLength = splitEntries[index].Length;
             }
@@ -134,7 +42,102 @@ namespace CSVFileDataManagement
             return largestStringLength;
         }
 
-        public static void SortColumnByRow(string rowName)
+        public void ClearVariables()
+        {
+            activeFileTemplate.Clear();
+            activeFileContents = Array.Empty<string>();
+            activeIndex = 0;
+        }
+
+        public void WriteActiveContentsToFile()
+        {
+            if (activeFileName == string.Empty)
+                return;
+
+            string writeContent = string.Empty;
+
+            for (int x = 0; x < activeFileContents.Length; x++)
+            {
+                string[] splitLine = activeFileContents[x].Split(splitChar);
+                string combinedLine = string.Empty;
+
+                for (int y = 0; y < splitLine.Length; y++)
+                {
+                    string addLine = splitLine[y];
+                    if (y < splitLine.Length - 1)
+                        addLine += splitChar;
+                    combinedLine += addLine;
+                }
+
+                writeContent += combinedLine;
+
+                if (x < activeFileContents.Length - 1)
+                    writeContent += Environment.NewLine;
+            }
+
+            File.WriteAllText(activeFileName, writeContent);
+        }
+
+        public void CreateCSVFile(string fileName)
+        {
+            Console.WriteLine($"Enter the file template separated by {splitChar}.");
+            string template = Console.ReadLine();
+            if(template == null || template.Length == 0)
+            {
+                Console.WriteLine("Invalid template was given.");
+                CreateCSVFile(fileName);
+            }
+            else
+            {
+                File.Create(fileName);
+                File.WriteAllText(fileName, template);
+            }
+        }
+
+        public void SetActiveFile(string fileName)
+        {
+            activeFileName = fileName;
+
+            if (File.Exists(activeFileName))
+            {
+                Console.WriteLine($"{fileName} was found");
+            }
+            else
+            {
+                Console.WriteLine($"{fileName} was not found, would you like to create it? ('yes' to continue)");
+                string userInput = Console.ReadLine();
+
+                if (userInput == "yes")
+                    CreateCSVFile(fileName);
+                else
+                    activeFileName = string.Empty;
+            }
+        }
+
+        public void ReadActiveFile()
+        {
+
+            if (activeFileName == string.Empty)
+                return;
+            ClearVariables();
+
+            string fileData = File.ReadAllText(activeFileName);
+            activeFileContents = fileData.Split(Environment.NewLine);
+
+            string[] splitFileTemplate = activeFileContents[0].Split(splitChar);
+            for (int i = 0; i < splitFileTemplate.Length; i++)
+                activeFileTemplate.Add(splitFileTemplate[i].ToLower(), i);
+        }
+
+        public void SetActiveIndex(int index)
+        {
+            if (index > activeFileContents.Length - 1 || index == 0)
+                Console.WriteLine("Requested index exceeded allowed range.");
+            else
+                activeIndex = index;
+        }
+
+        public void SortColumnByRow(string rowName)
         {
             int fieldIndex = activeFileTemplate[rowName];
             Dictionary<int, string> rowList = new Dictionary<int, string>();
@@ -153,6 +156,7 @@ namespace CSVFileDataManagement
             {
                 int rowIndex = entry.Key;
                 string sortedValue = entry.Value;
+
                 string str = activeFileContents[rowIndex];
                 string[] splitLine = str.Split(splitChar);
 
@@ -166,7 +170,7 @@ namespace CSVFileDataManagement
             WriteActiveContentsToFile();
         }
 
-        public static void AddRow()
+        public void AddColumn()
         {
             string writeString = string.Empty;
 
@@ -181,14 +185,19 @@ namespace CSVFileDataManagement
                     writeString += splitChar;
             }
 
-            StreamWriter writer = new StreamWriter(activeFilePath, append: true);
+            StreamWriter writer = new StreamWriter(activeFileName, append: true);
             writer.Write($"{Environment.NewLine}{writeString}");
             writer.Close();
 
             ReadActiveFile();
         }
 
-        public static void ModifyRowData(string rowName, string newValue)
+        public void DeleteColumn()
+        {
+
+        }
+
+        public void ModifyRowData(string rowName, string newValue)
         {
             foreach (KeyValuePair<string, int> entry in activeFileTemplate)
             {
@@ -213,16 +222,38 @@ namespace CSVFileDataManagement
             WriteActiveContentsToFile();
         }
 
-        public static void PrintData()
+        private int GetTemplateIndex(string row)
+        {
+            row = row.ToLower();
+
+            if(activeFileTemplate.ContainsKey(row))
+                return activeFileTemplate[row];
+
+            return -1;
+        }
+
+        public void PrintData()
         {
             if (activeFileContents == null || activeFileContents.Length == 0)
                 return;
 
             Vector2 consoleSize = new Vector2(Console.WindowWidth, Console.WindowHeight);
-            string consoleFillerString = new string(fillChar, (int)consoleSize.X);
-            int calculatedWidthRequired = GetArrayMaxLength(activeFileContents) + 12; // will probably not work in larger fontsizes
+            int calculatedWidthRequired = GetArrayMaxLength(activeFileContents) + 12;
 
-            if (calculatedWidthRequired > Console.WindowWidth)
+            /*
+                         if (calculatedWidthRequired > Console.WindowWidth) // will probably not work in larger fontsizes
+                        {
+                            Console.WriteLine("The console window is too small to show the output!");
+                            return;
+                        }
+            */
+
+            try
+            {
+                Console.SetCursorPosition(calculatedWidthRequired + 10, Console.GetCursorPosition().Top);
+                Console.SetCursorPosition(0, Console.GetCursorPosition().Top);
+            }
+            catch (Exception e)
             {
                 Console.WriteLine("The console window is too small to show the output!");
                 return;
@@ -232,7 +263,12 @@ namespace CSVFileDataManagement
 
             for (int x = 0; x < activeFileContents.Length; x++)
             {
-                string str = activeFileContents[x];
+                string startStr = $"Index{splitChar}";
+
+                if(x > 0)
+                    startStr = $"{x.ToString()}{splitChar}";
+
+                string str = $"{startStr}{activeFileContents[x]}";
 
                 string[] splitEntries = str.Split(splitChar);
                 int linePosition = Console.GetCursorPosition().Top + 1;
@@ -242,10 +278,27 @@ namespace CSVFileDataManagement
                 if (activeIndex == x && x != 0) // 0 = template
                     activeColor = CSVApplication.Colors.selectedColor;
                 Console.ForegroundColor = activeColor;
-
+                
                 for (int y = 0; y < splitEntries.Length; y++)
                 {
-                    int columnWidth = GetColumnLength(activeFileContents, y);
+                    if (y != 0 && GetTemplateIndex("birthday") == y)
+                    {
+                        if (CSVApplication.Functions.UpcomingDate(splitEntries[y], 10))
+                        {
+                            if (CSVApplication.Functions.IsDateToday(splitEntries[y]))
+                                Console.ForegroundColor = CSVApplication.Colors.urgentColor;
+                            else
+                                Console.ForegroundColor = CSVApplication.Colors.upcomingColor;
+                        }
+                    }
+
+                    int columnWidth = 0;
+
+                    if (y == 0)
+                        columnWidth = activeFileContents.Length % 10 + 4;
+                    else
+                        columnWidth = GetColumnLength(activeFileContents, y-1);
+
                     Console.Write(splitEntries[y]);
                     activeColumnPosition += columnWidth + columnSpacing;
                     Console.SetCursorPosition(activeColumnPosition, Console.GetCursorPosition().Top);
@@ -260,16 +313,3 @@ namespace CSVFileDataManagement
         }
     }
 }
-
-/*
-                    if (y == activeFileTemplate["födelsedag"])
-                    {
-                        if (CSVApplication.Functions.UpcomingDate(splitEntries[y], 10))
-                        {
-                            Console.ForegroundColor = CSVApplication.Colors.upcomingColor;
-
-                            if (CSVApplication.Functions.IsDateToday(splitEntries[y]))
-                                Console.ForegroundColor = CSVApplication.Colors.urgentColor;
-                        }
-                    }
- */

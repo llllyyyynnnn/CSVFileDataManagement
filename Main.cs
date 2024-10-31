@@ -1,5 +1,7 @@
 ﻿using CSVFileDataManagement;
 
+CSVManager manager = new CSVManager();
+
 void WaitForCommand()
 {
     try
@@ -16,19 +18,19 @@ void WaitForCommand()
                 switch (splitInputToLower[1])
                 {
                     case "index":
-                        CSVManager.SetActiveIndex(int.Parse(splitInput[2]));
+                        manager.SetActiveIndex(int.Parse(splitInput[2]));
                         break;
 
                     case "file":
-                        CSVManager.SetActiveFile(splitInput[2]);
+                        manager.SetActiveFile(splitInput[2]);
                         break;
                 }
                 break;
             case "add":
                 switch (splitInputToLower[1])
                 {
-                    case "row":
-                        CSVManager.AddRow();
+                    case "column":
+                        manager.AddColumn();
                         break;
                 }
                 break;
@@ -38,19 +40,20 @@ void WaitForCommand()
                 {
                     case "row":
                         int commandLength = splitInputToLower[0].Length + splitInputToLower[1].Length + splitInputToLower[2].Length + 3;
-                        CSVManager.ModifyRowData(splitInputToLower[2], input.Substring(commandLength, input.Length - commandLength));
+                        manager.ModifyRowData(splitInputToLower[2], input.Substring(commandLength, input.Length - commandLength));
                         break;
                 }
                 break;
             case "sort":
                 if (splitInputToLower[1] == "alphabetical")
-                    CSVManager.SortColumnByRow(splitInputToLower[2]);
+                    manager.SortColumnByRow(splitInputToLower[2]);
                 break;
             case "help":
                 Console.WriteLine("set index *");
                 Console.WriteLine("set file path.csv");
                 Console.WriteLine("add row");
                 Console.WriteLine("modify row fieldName newValue");
+                Console.WriteLine("sort alphabetical row");
                 break;
         }
     }
@@ -65,15 +68,15 @@ while (true)
     Console.ForegroundColor = CSVApplication.Colors.foregroundColor;
     Console.Clear();
 
-    if (CSVManager.activeFileName == string.Empty)
+    if (manager.activeFileName == string.Empty)
     {
         Console.WriteLine("Enter the name of the csv file you would like to read (*.csv)");
-        CSVManager.SetActiveFile(Console.ReadLine());
-        CSVManager.ReadActiveFile();
+        manager.SetActiveFile(Console.ReadLine());
+        manager.ReadActiveFile();
     }
     else
     {
-        CSVManager.PrintData();
+        manager.PrintData();
         WaitForCommand();
     }
 }
