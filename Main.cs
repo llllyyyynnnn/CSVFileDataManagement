@@ -1,10 +1,11 @@
 ﻿CSVManager manager = new CSVManager();
 
-void WaitForCommand()
+void CommandParser(string input = "")
 {
     try
     {
-        string input = Console.ReadLine();
+        if(input == "")
+            input = Console.ReadLine();
         string inputToLower = input.ToLower();
         string[] splitInput = input.Split(' ');
         string[] splitInputToLower = inputToLower.Split(' ');
@@ -62,8 +63,14 @@ void WaitForCommand()
     }
     catch (Exception ex) {
         Console.WriteLine(ex.Message);
-        WaitForCommand();
+        CommandParser();
     }
+}
+
+void ForcedCommands()
+{
+    if(manager.activeFileTemplate.ContainsKey("name"))
+        CommandParser("sort alphabetical name");
 }
 
 while (true)
@@ -79,7 +86,8 @@ while (true)
     }
     else
     {
+        ForcedCommands();
         manager.PrintData();
-        WaitForCommand();
+        CommandParser();
     }
 }

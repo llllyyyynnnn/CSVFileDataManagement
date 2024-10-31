@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 internal class CSVManager
 {
     public string activeFileName = string.Empty;
-    private Dictionary<string, int> activeFileTemplate = new Dictionary<string, int>();
+    public Dictionary<string, int> activeFileTemplate = new Dictionary<string, int>();
     private string[] activeFileContents = Array.Empty<string>();
     private int activeIndex = 0;
 
@@ -195,7 +195,36 @@ internal class CSVManager
 
             currentIndex++;
         }
+        /*
+                 int fieldIndex = activeFileTemplate[rowName];
+                Dictionary<int, string> rowList = new Dictionary<int, string>();
 
+                for (int i = 1; i < activeFileContents.Length; i++)
+                {
+                    string str = activeFileContents[i];
+                    string[] splitLine = str.Split(splitChar);
+                    string activeString = splitLine[activeFileTemplate[rowName]];
+
+                    rowList.Add(i, activeString);
+                }
+
+                int currentIndex = 1;
+                foreach (var entry in rowList.OrderBy(kv => kv.Value))
+                {
+                    int rowIndex = entry.Key;
+                    string sortedValue = entry.Value;
+
+                    string str = activeFileContents[rowIndex];
+                    string[] splitLine = str.Split(splitChar);
+
+                    splitLine[fieldIndex] = sortedValue;
+                    //splitLine[0] = currentIndex.ToString();
+                    activeFileContents[currentIndex] = string.Join(splitChar.ToString(), splitLine);
+
+                    currentIndex++;
+                }
+
+         */
         //WriteActiveContentsToFile();
     }
 
