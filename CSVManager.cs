@@ -14,6 +14,7 @@ internal class CSVManager
     private static char spaceChar = '|';
 
     private static int columnSpacing = 2;
+
     private static int GetArrayMaxLength(string[] array)
     {
         int largestStringLength = 0;
@@ -178,6 +179,7 @@ internal class CSVManager
             string activeString = splitLine[activeFileTemplate[rowName]];
 
             rowList.Add(i, activeString);
+            Console.WriteLine($"{i} = {activeString} at {str}");
         }
 
         int currentIndex = 1;
@@ -190,6 +192,10 @@ internal class CSVManager
             string[] splitLine = str.Split(splitChar);
 
             splitLine[fieldIndex] = sortedValue;
+            /*
+                         Console.WriteLine($"splitLine[{fieldIndex}] = {sortedValue} at {str}, newStr = {string.Join(splitChar.ToString(), splitLine)}\n");
+                        Console.ReadLine();
+             */
             //splitLine[0] = currentIndex.ToString();
             activeFileContents[currentIndex] = string.Join(splitChar.ToString(), splitLine);
 
