@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Reflection.Metadata;
+using System.Text.RegularExpressions;
 
 /*
 // project goal: no List / Dictionary usage and follow Contacts structure
@@ -368,13 +369,23 @@ internal class CSVManager
                 if (i == -1)
                     printString = row; // show the user the current row
                 else
+                {
                     printString = AccessContactData(ref contacts[i], row); // because we aren't giving the function a value as a 3rd parameter, it knows we want to read and will return the row value of the contact
+                    if(row == "Birthday")
+                    {
+                        if (CSVApplication.Functions.UpcomingDate(printString, 10)) // if date is in 10 days, check if it's already today and change to appropiate colors
+                        {
+                            activeColor = CSVApplication.Colors.upcomingColor;
+                            if (CSVApplication.Functions.IsDateToday(printString))
+                                activeColor = CSVApplication.Colors.urgentColor;
+
+                            Console.ForegroundColor = activeColor;
+                        }
+                    }
+                }
+
                 int columnWidth = GetRowWidth(contacts, row); // gets the current rows width, so we can write the data using it and stay consistent and line up with the rest of the outputs
 
-                if(row.ToLower() == "birthday")
-                {
-                    
-                }
                 WriteData(printString, columnWidth, ref columnPosition); // we are using ref columnPosition so that the function itself can have a direct reference and modify the value of the variable, so we don't have to assign it ourselves here
             }
 
