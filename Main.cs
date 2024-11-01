@@ -10,54 +10,34 @@ void CommandParser(string input = "")
         string[] splitInput = input.Split(' ');
         string[] splitInputToLower = inputToLower.Split(' ');
         
-
         switch (splitInputToLower[0])
         {
             case "set":
-                switch (splitInputToLower[1])
-                {
-                    case "index":
+                if (splitInputToLower[1] == "index")
+                    try
+                    {
                         manager.SetActiveIndex(int.Parse(splitInput[2]));
-                        break;
-                }
-                break;
-            case "add":
-                switch (splitInputToLower[1])
-                {
-                    case "column":
-                        manager.AddColumn();
-                        break;
-                }
-                break;
-            case "delete":
-                if (splitInputToLower[1] == "column")
-                    manager.DeleteColumn();
-                break;
-            case "modify":
-                switch (splitInputToLower[1])
-                {
-                    case "row":
-                        manager.ModifyRowData(splitInputToLower[2]);
-                        break;
-                }
-                break;
-            case "sort":
-                if (splitInputToLower[1] == "alphabetical")
-                    manager.SortColumnByRow(splitInputToLower[2]);
+                    }
+                    catch (Exception ex) 
+                    {
+                        Console.WriteLine($"Invalid format. {ex}");
+                    }
                 break;
 
-            case "save":
-                manager.WriteActiveContentsToFile();
+            case "modify":
+                if (splitInputToLower[1] == "row")
+                    manager.ModifyRow(splitInputToLower[2]);
                 break;
-            case "write":
-                manager.WriteActiveContentsToFile();
+        }
+
+        switch (inputToLower) // for strings that dont require any additional inputs
+        {
+            case "delete column":
+                manager.DeleteColumn();
                 break;
-            case "help":
-                Console.WriteLine("set index *");
-                Console.WriteLine("set file path.csv");
-                Console.WriteLine("add row");
-                Console.WriteLine("modify row fieldName newValue");
-                Console.WriteLine("sort alphabetical row");
+
+            case "add column":
+                manager.AddColumn();
                 break;
         }
     }
@@ -69,8 +49,7 @@ void CommandParser(string input = "")
 
 void ForcedCommands()
 {
-    if(manager.activeFileTemplate.ContainsKey("name"))
-        CommandParser("sort alphabetical name");
+
 }
 
 while (true)
